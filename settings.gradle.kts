@@ -1,4 +1,6 @@
 rootProject.name = "sorry-this-is-like-my-fifth-minecraft-gui-library"
 
-include("example")
+if (System.getenv("JITPACK").isNullOrBlank()) {
+    include("example")
+}
 include("ravioli-gui")
