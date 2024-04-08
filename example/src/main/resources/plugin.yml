@@ -1,0 +1,4 @@
+name: ExampleMenuPlugin
+version: 1
+main: ravioli.gravioli.MenuPlugin
+api-version: 1.20
