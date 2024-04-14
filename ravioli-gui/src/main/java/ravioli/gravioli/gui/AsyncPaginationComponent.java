@@ -87,7 +87,11 @@ public class AsyncPaginationComponent extends MenuComponent.DecoratorMenuCompone
     }
 
     public void refresh() {
-        this.load(this.page.get(), false, true)
+        this.refresh(true);
+    }
+
+    public void refresh(final boolean clear) {
+        this.load(this.page.get(), false, clear)
             .whenComplete((result, error) -> this.processStateQueue());
     }
 

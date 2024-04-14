@@ -5,10 +5,9 @@ import com.google.common.collect.Table;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.SkullMeta;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Consumer;
@@ -42,8 +41,6 @@ public final class MenuRenderer {
         this.itemLock.writeLock().lock();
 
         try {
-            inventory.clear();
-
             this.previousPositionableItems.cellSet().forEach(cell -> {
                 final int x = cell.getRowKey();
                 final int y = cell.getColumnKey();
@@ -69,10 +66,11 @@ public final class MenuRenderer {
 
                     return;
                 }
-                if (currentItem.getType() != newItem.getType()) {
-                    currentItem.setType(newItem.getType());
+                if (!(newItem.getItemMeta() instanceof SkullMeta) && currentItem.getType() == newItem.getType()) {
+                    currentItem.setItemMeta(newItem.getItemMeta());
+
+                    return;
                 }
-                currentItem.setItemMeta(newItem.getItemMeta());
                 inventory.setItem(slot, newItem);
             });
             this.previousPositionableItems.clear();

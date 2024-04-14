@@ -78,8 +78,10 @@ public abstract class Menu extends MenuComponent.PositionableMenuComponent<Menu>
         );
 
         this.renderRoot();
-        this.player.openInventory(this.inventory);
 
+        Bukkit.getScheduler().getMainThreadExecutor(this.plugin).execute(() -> {
+            this.player.openInventory(this.inventory);
+        });
         Bukkit.getPluginManager().registerEvents(this.menuListeners, this.plugin);
     }
 
@@ -316,20 +318,26 @@ public abstract class Menu extends MenuComponent.PositionableMenuComponent<Menu>
     }
 
     private @NotNull StateController getState(@NotNull final MenuComponent<?> component, final boolean reset) {
-        final StateController state = this.cachedMenuStates.computeIfAbsent(
-            component.getInternalId(),
-            __ -> new StateController(() -> {
-                if (!component.mounted) {
-                    return;
-                }
-                this.render();
-            }, component.getStateController())
-        );
+        this.renderLock.writeLock().lock();
 
-        if (reset) {
-            state.reset();
+        try {
+            final StateController state = this.cachedMenuStates.computeIfAbsent(
+                component.getInternalId(),
+                __ -> new StateController(() -> {
+                    if (!component.mounted) {
+                        return;
+                    }
+                    this.render();
+                }, component.getStateController())
+            );
+
+            if (reset) {
+                state.reset();
+            }
+            return state;
+        } finally {
+            this.renderLock.writeLock().unlock();
         }
-        return state;
     }
 
     public abstract void init(@NotNull MenuInitializer menuInitializer);
@@ -341,6 +349,8 @@ public abstract class Menu extends MenuComponent.PositionableMenuComponent<Menu>
                 return;
             }
             HandlerList.unregisterAll(this);
+
+            this.unmountMenu(Menu.this.currentRenderOutput);
         }
 
         @EventHandler
@@ -353,6 +363,11 @@ public abstract class Menu extends MenuComponent.PositionableMenuComponent<Menu>
             event.setCancelled(true);
 
             Menu.this.menuRenderer.handleClick(event);
+        }
+
+        private void unmountMenu(@NotNull final MenuComponentNode node) {
+            node.getComponent().unmount();
+            node.getChildren().forEach(this::unmountMenu);
         }
     }
 }

@@ -45,7 +45,7 @@ public final class ItemComponent extends MenuComponent.PositionableMenuComponent
     }
 
     @Override
-    public @NotNull RenderOutput render(@NotNull final RenderContext renderContext) {
+    public @NotNull RenderOutput<?> render(@NotNull final RenderContext renderContext) {
         return RenderOutput.create();
     }
 
