@@ -43,8 +43,8 @@ public class AsyncPaginationComponent extends MenuComponent.DecoratorMenuCompone
 
     @Override
     public void mount() {
-        this.load(this.page.get(), true, true)
-            .whenComplete((result, error) -> {
+        this.load(this.page.get(), true, false)
+            .whenCompleteAsync((result, error) -> {
                 this.processStateQueue();
             });
     }
@@ -139,13 +139,14 @@ public class AsyncPaginationComponent extends MenuComponent.DecoratorMenuCompone
         if (task != null && !task.isDone()) {
             task.completeExceptionally(new RuntimeException("New page loading task started."));
         }
-        this.hasNext.queue(false);
+        if (!init) {
+            this.hasNext.queue(false);
 
-        if (clear) {
-            this.items.queue(new ArrayList<>());
+            if (clear) {
+                this.items.queue(new ArrayList<>());
+            }
+            this.processStateQueue();
         }
-        this.processStateQueue();
-
         final CompletableFuture<Void> newTask = CompletableFuture.supplyAsync(() -> this.pageProvider.load(page, this.mask.getSize()))
             .exceptionally((e) -> {
                 LOGGER.error("Unable to load page.", e);

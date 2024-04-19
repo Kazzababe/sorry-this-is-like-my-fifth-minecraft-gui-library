@@ -57,7 +57,9 @@ public final class MenuRenderer {
                 inventory.clear(slot);
             });
             this.positionableItems.cellSet().forEach(cell -> {
-                final int slot = cell.getColumnKey() * 9 + cell.getRowKey();
+                final int x = cell.getRowKey();
+                final int y = cell.getColumnKey();
+                final int slot = y * 9 + x;
                 final ItemStack currentItem = inventory.getItem(slot);
                 final ItemStack newItem = cell.getValue();
 
@@ -66,12 +68,12 @@ public final class MenuRenderer {
 
                     return;
                 }
-                if (!(newItem.getItemMeta() instanceof SkullMeta) && currentItem.getType() == newItem.getType()) {
+                if (newItem.getItemMeta() instanceof SkullMeta || currentItem.getType() != newItem.getType()) {
+                    inventory.setItem(slot, newItem);
+                } else {
                     currentItem.setItemMeta(newItem.getItemMeta());
-
-                    return;
+                    currentItem.setAmount(newItem.getAmount());
                 }
-                inventory.setItem(slot, newItem);
             });
             this.previousPositionableItems.clear();
             this.previousPositionableItems.putAll(this.positionableItems);

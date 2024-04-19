@@ -76,7 +76,6 @@ public abstract class Menu extends MenuComponent.PositionableMenuComponent<Menu>
             9 * this.menuInitializer.getHeight(),
             this.queuedTitle
         );
-
         this.renderRoot();
 
         Bukkit.getScheduler().getMainThreadExecutor(this.plugin).execute(() -> {
@@ -327,7 +326,7 @@ public abstract class Menu extends MenuComponent.PositionableMenuComponent<Menu>
                     if (!component.mounted) {
                         return;
                     }
-                    this.render();
+                    Bukkit.getScheduler().getMainThreadExecutor(this.plugin).execute(this::render);
                 }, component.getStateController())
             );
 
