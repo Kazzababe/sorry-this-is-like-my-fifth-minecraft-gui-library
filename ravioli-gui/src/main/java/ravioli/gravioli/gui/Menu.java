@@ -199,7 +199,6 @@ public abstract class Menu extends MenuComponent.PositionableMenuComponent<Menu>
                 final MenuComponent<?> currentMenuComponent = currentNode.getComponent();
 
                 this.flattenChildren(currentNode).forEach(MenuComponent::unmount);
-
                 currentMenuComponent.unmount();
 
                 continue;
@@ -254,6 +253,7 @@ public abstract class Menu extends MenuComponent.PositionableMenuComponent<Menu>
         return building;
     }
 
+    @SuppressWarnings({"unchecked", "rawtypes"})
     private boolean areSimilar(@NotNull final MenuComponent<?> component1, @NotNull final MenuComponent<?> component2) {
         if (component1 == component2) {
             return true;
@@ -261,7 +261,18 @@ public abstract class Menu extends MenuComponent.PositionableMenuComponent<Menu>
         if (component1.getType() != component2.getType()) {
             return false;
         }
-        return component1.getClass() == component2.getClass();
+        if (component1.getClass() != component2.getClass()) {
+            return false;
+        }
+        if (component2.getRef() != null) {
+            if (component1.getRef() == null) {
+                return false;
+            }
+            if (Objects.equals(component1.getRef().get(), component2.getRef().get())) {
+                return true;
+            }
+        }
+        return ((MenuComponent) component1).propsMatch(component2);
     }
 
     private void tryReconcileTitle(@NotNull final RenderOutput<?> renderOutput) {
