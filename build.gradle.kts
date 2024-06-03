@@ -1,5 +1,6 @@
 plugins {
     java
+    id("io.papermc.paperweight.userdev") version("1.7.0") apply false
 }
 
 allprojects {
@@ -12,10 +13,7 @@ allprojects {
         mavenCentral()
 
         maven("https://repo.papermc.io/repository/maven-public/")
-    }
-
-    dependencies {
-        compileOnly("io.papermc.paper:paper-api:1.20.4-R0.1-SNAPSHOT")
+        maven("https://repo.dmulloy2.net/repository/public/")
     }
 
     java {

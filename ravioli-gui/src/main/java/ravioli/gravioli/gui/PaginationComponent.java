@@ -53,7 +53,7 @@ public class PaginationComponent extends MenuComponent.DecoratorMenuComponent<Pa
         final int pageSize = this.mask.getSize();
         final int maxPages = (int) Math.ceil((double) this.items.length / pageSize);
 
-        if (this.page.get() >= maxPages) {
+        if (this.items.length > 0 && this.page.get() >= maxPages) {
             throw new RuntimeException("BAD!");
         }
         final RenderOutput<?> renderOutput = RenderOutput.create();

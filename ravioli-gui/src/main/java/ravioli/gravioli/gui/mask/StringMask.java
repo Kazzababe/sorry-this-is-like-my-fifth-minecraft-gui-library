@@ -2,7 +2,6 @@ package ravioli.gravioli.gui.mask;
 
 import com.google.common.primitives.Ints;
 import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ravioli.gravioli.gui.position.Position;

@@ -4,9 +4,9 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import ravioli.gravioli.gui.model.ComponentType;
 import ravioli.gravioli.gui.MenuComponent;
 import ravioli.gravioli.gui.MenuComponentLike;
+import ravioli.gravioli.gui.model.ComponentType;
 
 public sealed interface RenderOutputNode extends MenuComponentLike permits RenderOutputNode.PositionedRenderOutputNode, RenderOutputNode.DecoratorRenderOutputNode {
     @NotNull MenuComponent<?> getComponent();

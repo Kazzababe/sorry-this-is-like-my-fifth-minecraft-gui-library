@@ -7,14 +7,18 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.ClickType;
+import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import ravioli.gravioli.gui.model.RenderType;
 import ravioli.gravioli.gui.reconcilation.MenuComponentNode;
 import ravioli.gravioli.gui.render.ItemRenderer;
 import ravioli.gravioli.gui.render.MenuRenderOutput;
@@ -54,7 +58,15 @@ public abstract class Menu extends MenuComponent.PositionableMenuComponent<Menu>
 
         this.menuListeners = new MenuListeners();
         this.menuInitializer = new MenuInitializer();
-        this.menuRenderer = new MenuRenderer();
+        this.menuRenderer = new MenuRenderer(this);
+    }
+
+    public final @NotNull Player getPlayer() {
+        return this.player;
+    }
+
+    public final @NotNull Plugin getPlugin() {
+        return this.plugin;
     }
 
     @Override
@@ -67,15 +79,39 @@ public abstract class Menu extends MenuComponent.PositionableMenuComponent<Menu>
         return this.menuInitializer.getHeight();
     }
 
+    public final int getSize() {
+        return this.getWidth() * this.getHeight();
+    }
+
+    public @NotNull RenderType getRenderType() {
+        if (this.getHeight() > 6) {
+            return RenderType.PACKET;
+        }
+        return RenderType.PHYSICAL;
+    }
+
+    public final void simulateClick(final int slot, @NotNull final ClickType clickType) {
+        final InventoryClickEvent fakeEvent = new InventoryClickEvent(
+            this.player.getOpenInventory(),
+            InventoryType.SlotType.CONTAINER,
+            slot,
+            clickType,
+            InventoryAction.NOTHING
+        );
+
+        this.menuRenderer.handleClick(fakeEvent);
+    }
+
     public final void open() {
         this.init(this.menuInitializer);
         this.reconcile();
 
         this.inventory = Bukkit.createInventory(
             this,
-            9 * this.menuInitializer.getHeight(),
+            9 * Math.min(6, this.menuInitializer.getHeight()),
             this.queuedTitle
         );
+        this.menuRenderer.init();
         this.renderRoot();
 
         Bukkit.getScheduler().getMainThreadExecutor(this.plugin).execute(() -> {
@@ -359,6 +395,7 @@ public abstract class Menu extends MenuComponent.PositionableMenuComponent<Menu>
                 return;
             }
             HandlerList.unregisterAll(this);
+            Menu.this.menuRenderer.cleanup();
 
             this.unmountMenu(Menu.this.currentRenderOutput);
         }
