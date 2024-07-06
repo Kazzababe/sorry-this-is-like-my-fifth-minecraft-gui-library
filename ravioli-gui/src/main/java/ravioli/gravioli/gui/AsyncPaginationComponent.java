@@ -80,7 +80,12 @@ public class AsyncPaginationComponent extends MenuComponent.DecoratorMenuCompone
             if (pageItems == null || index >= pageItems.size()) {
                 return;
             }
-            renderOutput.set(position.x(), position.y(), pageItems.get(index));
+            final PositionableMenuComponent<?> pageItem = pageItems.get(index);
+
+            if (pageItem == null) {
+                return;
+            }
+            renderOutput.set(position.x(), position.y(), pageItem);
         });
 
         return renderOutput;
